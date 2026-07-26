@@ -1,0 +1,880 @@
+<title>نموذج بيانات الاتفاقية بين المراكز الصحية</title>
+<style>
+  :root {
+    --bg: #f5f7f6;
+    --surface: #ffffff;
+    --surface-2: #eef2f0;
+    --text: #182420;
+    --text-muted: #5b6a63;
+    --border: #dde4e0;
+    --primary: #0e6e5d;
+    --primary-dark: #0a4f42;
+    --primary-tint: #e4f2ee;
+    --danger: #b3261e;
+    --danger-tint: #fbeceb;
+    --focus-ring: rgba(14, 110, 93, 0.35);
+    --shadow: 0 1px 2px rgba(20, 30, 26, 0.04), 0 8px 24px rgba(20, 30, 26, 0.06);
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #0f1613;
+    --surface: #16201c;
+    --surface-2: #1c2822;
+    --text: #e8ede9;
+    --text-muted: #a2b0a9;
+    --border: #2a3830;
+    --primary: #35b696;
+    --primary-dark: #59cdae;
+    --primary-tint: #17322a;
+    --danger: #e5837c;
+    --danger-tint: #33201f;
+    --focus-ring: rgba(53, 182, 150, 0.4);
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.35);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0f1613;
+      --surface: #16201c;
+      --surface-2: #1c2822;
+      --text: #e8ede9;
+      --text-muted: #a2b0a9;
+      --border: #2a3830;
+      --primary: #35b696;
+      --primary-dark: #59cdae;
+      --primary-tint: #17322a;
+      --danger: #e5837c;
+      --danger-tint: #33201f;
+      --focus-ring: rgba(53, 182, 150, 0.4);
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.35);
+    }
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text);
+  }
+
+  body {
+    direction: rtl;
+    font-family: "Segoe UI", Tahoma, "Noto Kufi Arabic", Arial, sans-serif;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    padding: 40px 16px 80px;
+  }
+
+  .page {
+    max-width: 760px;
+    margin: 0 auto;
+  }
+
+  .letterhead {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 28px;
+  }
+
+  .letterhead .mark {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    background: linear-gradient(155deg, var(--primary), var(--primary-dark));
+    flex: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 19px;
+  }
+
+  .letterhead .kicker {
+    font-size: 12.5px;
+    letter-spacing: 0.02em;
+    color: var(--text-muted);
+    font-weight: 600;
+  }
+
+  .letterhead .kicker strong {
+    color: var(--text);
+  }
+
+  header.intro {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 28px 30px;
+    box-shadow: var(--shadow);
+    margin-bottom: 28px;
+  }
+
+  h1 {
+    font-size: 24px;
+    margin: 0 0 6px;
+    font-weight: 700;
+    text-wrap: balance;
+    letter-spacing: -0.01em;
+  }
+
+  .subtitle {
+    margin: 0 0 16px;
+    color: var(--text-muted);
+    font-size: 14.5px;
+  }
+
+  .lede {
+    margin: 0;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    color: var(--text);
+    font-size: 14.5px;
+    line-height: 1.75;
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+  }
+
+  fieldset {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 26px 28px 28px;
+    box-shadow: var(--shadow);
+  }
+
+  legend {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    padding: 0 6px;
+    font-size: 15.5px;
+    font-weight: 700;
+    color: var(--primary-dark);
+  }
+
+  .field-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px 20px;
+    margin-top: 18px;
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .field.full {
+    grid-column: 1 / -1;
+  }
+
+  label {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--text);
+    display: flex;
+    gap: 4px;
+  }
+
+  label .req {
+    color: var(--danger);
+  }
+
+  label .opt {
+    font-weight: 400;
+    color: var(--text-muted);
+    font-size: 12px;
+  }
+
+  .hint {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: -2px;
+  }
+
+  input[type="text"],
+  input[type="tel"],
+  input[type="email"],
+  select,
+  textarea {
+    font: inherit;
+    font-size: 14.5px;
+    color: var(--text);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 10px 12px;
+    width: 100%;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 84px;
+    font-family: inherit;
+  }
+
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--focus-ring);
+  }
+
+  input.invalid,
+  textarea.invalid,
+  select.invalid {
+    border-color: var(--danger);
+    background: var(--danger-tint);
+  }
+
+  .error-msg {
+    font-size: 12px;
+    color: var(--danger);
+    min-height: 14px;
+  }
+
+  .radio-row,
+  .check-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 4px;
+  }
+
+  .radio-row label,
+  .check-grid label {
+    font-weight: 500;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 9px 14px;
+    cursor: pointer;
+    flex: 1 1 auto;
+    justify-content: flex-start;
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+
+  .check-grid label {
+    flex: 1 1 46%;
+  }
+
+  .radio-row input,
+  .check-grid input {
+    accent-color: var(--primary);
+    width: 16px;
+    height: 16px;
+    flex: none;
+  }
+
+  .radio-row label:has(input:checked),
+  .check-grid label:has(input:checked) {
+    border-color: var(--primary);
+    background: var(--primary-tint);
+  }
+
+  .ack-box {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    background: var(--primary-tint);
+    border: 1px solid var(--primary);
+    border-radius: 10px;
+    padding: 16px 18px;
+    margin-top: 16px;
+  }
+
+  .ack-box input {
+    margin-top: 3px;
+    width: 17px;
+    height: 17px;
+    accent-color: var(--primary);
+    flex: none;
+  }
+
+  .ack-box p {
+    margin: 0;
+    font-size: 13.5px;
+    line-height: 1.7;
+  }
+
+  .actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  button.submit {
+    font: inherit;
+    font-weight: 700;
+    font-size: 15px;
+    color: #fff;
+    background: linear-gradient(155deg, var(--primary), var(--primary-dark));
+    border: none;
+    border-radius: 10px;
+    padding: 13px 30px;
+    cursor: pointer;
+    box-shadow: 0 6px 18px -6px rgba(14, 110, 93, 0.55);
+  }
+
+  button.submit:hover {
+    filter: brightness(1.05);
+  }
+
+  button.submit:focus-visible {
+    outline: 3px solid var(--focus-ring);
+    outline-offset: 2px;
+  }
+
+  .actions .status-hint {
+    font-size: 12.5px;
+    color: var(--text-muted);
+  }
+
+  .confirmation {
+    display: none;
+    background: var(--surface);
+    border: 1px solid var(--primary);
+    border-radius: 14px;
+    padding: 30px 28px;
+    box-shadow: var(--shadow);
+    text-align: center;
+  }
+
+  .confirmation.show {
+    display: block;
+  }
+
+  .confirmation .icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: var(--primary-tint);
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 14px;
+    font-size: 24px;
+  }
+
+  .confirmation h2 {
+    margin: 0 0 8px;
+    font-size: 18px;
+  }
+
+  .confirmation p {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 14px;
+  }
+
+  .records {
+    margin-top: 28px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 22px 24px 24px;
+    box-shadow: var(--shadow);
+  }
+
+  .records-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .records-head h2 {
+    font-size: 15px;
+    margin: 0;
+  }
+
+  .records-head .count {
+    font-size: 12.5px;
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  button.export {
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--primary-dark);
+    background: var(--primary-tint);
+    border: 1px solid var(--primary);
+    border-radius: 8px;
+    padding: 8px 16px;
+    cursor: pointer;
+  }
+
+  .records-table-wrap {
+    margin-top: 14px;
+    overflow-x: auto;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+  }
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    min-width: 640px;
+    font-size: 12.5px;
+  }
+
+  th, td {
+    padding: 9px 12px;
+    text-align: right;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+
+  th {
+    background: var(--surface-2);
+    font-weight: 700;
+    color: var(--text-muted);
+    position: sticky;
+    top: 0;
+  }
+
+  tr:last-child td {
+    border-bottom: none;
+  }
+
+  .empty-row td {
+    text-align: center;
+    color: var(--text-muted);
+    padding: 18px;
+  }
+
+  .disclosure {
+    margin-top: 22px;
+    font-size: 12px;
+    color: var(--text-muted);
+    text-align: center;
+    line-height: 1.7;
+  }
+
+  @media (max-width: 620px) {
+    .field-grid { grid-template-columns: 1fr; }
+    .check-grid label { flex: 1 1 100%; }
+    fieldset { padding: 20px 18px 22px; }
+    header.intro { padding: 22px 20px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; }
+  }
+</style>
+
+<div class="page">
+  <div class="letterhead">
+    <div class="mark">✚</div>
+    <div class="kicker">التنسيق الصحي المشترك<br><strong>قطاعا المجاردة وبارق</strong></div>
+  </div>
+
+  <header class="intro">
+    <h1>نموذج بيانات الاتفاقية بين المراكز الصحية</h1>
+    <p class="subtitle">بقطاعي المجاردة وبارق</p>
+    <p class="lede">يهدف هذا النموذج إلى جمع وتحديث بيانات المراكز الصحية بقطاعي المجاردة وبارق، لاستكمال إجراءات التنسيق وإعداد اتفاقيات التعاون بين المراكز الصحية.</p>
+  </header>
+
+  <form id="agreement-form" novalidate>
+    <fieldset>
+      <legend>بيانات المركز الصحي</legend>
+      <div class="field-grid">
+        <div class="field full">
+          <label for="center-name">اسم المركز الصحي <span class="req">*</span></label>
+          <input type="text" id="center-name" name="center-name" required autocomplete="off">
+          <span class="error-msg" data-error-for="center-name"></span>
+        </div>
+
+        <div class="field full">
+          <label for="sector">القطاع الصحي التابع له المركز <span class="req">*</span></label>
+          <div class="radio-row">
+            <label><input type="radio" name="sector" value="المجاردة" required> قطاع المجاردة</label>
+            <label><input type="radio" name="sector" value="بارق" required> قطاع بارق</label>
+          </div>
+          <span class="error-msg" data-error-for="sector"></span>
+        </div>
+
+        <div class="field">
+          <label for="manager-name">اسم مدير المركز الصحي <span class="req">*</span></label>
+          <input type="text" id="manager-name" name="manager-name" required autocomplete="off">
+          <span class="error-msg" data-error-for="manager-name"></span>
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>بيانات التواصل</legend>
+      <div class="field-grid">
+        <div class="field">
+          <label for="phone">رقم التواصل <span class="req">*</span></label>
+          <input type="tel" id="phone" name="phone" inputmode="numeric" placeholder="05xxxxxxxx" required>
+          <span class="hint">أرقام فقط</span>
+          <span class="error-msg" data-error-for="phone"></span>
+        </div>
+
+        <div class="field">
+          <label for="email">البريد الإلكتروني الرسمي للمركز <span class="req">*</span></label>
+          <input type="email" id="email" name="email" placeholder="name@moh.gov.sa" required>
+          <span class="error-msg" data-error-for="email"></span>
+        </div>
+
+        <div class="field">
+          <label for="coordinator-name">اسم منسق الاتفاقية بالمركز <span class="opt">(اختياري)</span></label>
+          <input type="text" id="coordinator-name" name="coordinator-name" autocomplete="off">
+        </div>
+
+        <div class="field">
+          <label for="coordinator-phone">رقم تواصل منسق الاتفاقية <span class="opt">(اختياري)</span></label>
+          <input type="tel" id="coordinator-phone" name="coordinator-phone" inputmode="numeric" placeholder="05xxxxxxxx">
+          <span class="error-msg" data-error-for="coordinator-phone"></span>
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>بيانات الاتفاقية المقترحة</legend>
+      <div class="field-grid">
+        <div class="field full">
+          <label for="partner-center">اسم المركز الصحي المقترح عمل الاتفاقية معه <span class="req">*</span></label>
+          <input type="text" id="partner-center" name="partner-center" required autocomplete="off">
+          <span class="error-msg" data-error-for="partner-center"></span>
+        </div>
+
+        <div class="field full">
+          <label>مجال التعاون في الاتفاقية <span class="req">*</span></label>
+          <div class="check-grid" id="cooperation-scope">
+            <label><input type="checkbox" name="scope" value="تغطية الإجازات ونقص القوى العاملة"> تغطية الإجازات ونقص القوى العاملة</label>
+            <label><input type="checkbox" name="scope" value="استقبال وتحويل العينات الطبية"> استقبال وتحويل العينات الطبية</label>
+            <label><input type="checkbox" name="scope" value="مشاركة الخدمات أو الأجهزة"> مشاركة الخدمات أو الأجهزة</label>
+            <label><input type="checkbox" name="scope" value="التعاون في الحالات الطارئة"> التعاون في الحالات الطارئة</label>
+            <label><input type="checkbox" name="scope" value="برامج الجودة والتدريب"> برامج الجودة والتدريب</label>
+            <label><input type="checkbox" name="scope" value="أخرى"> أخرى</label>
+          </div>
+          <span class="error-msg" data-error-for="scope"></span>
+        </div>
+
+        <div class="field full">
+          <label for="mechanism">تفاصيل وآلية التعاون المقترحة <span class="req">*</span></label>
+          <textarea id="mechanism" name="mechanism" required></textarea>
+          <span class="error-msg" data-error-for="mechanism"></span>
+        </div>
+
+        <div class="field full">
+          <label for="duration">مدة الاتفاقية المقترحة <span class="req">*</span></label>
+          <select id="duration" name="duration" required>
+            <option value="" disabled selected>اختر المدة</option>
+            <option value="سنة واحدة">سنة واحدة</option>
+            <option value="سنتان">سنتان</option>
+            <option value="ثلاث سنوات">ثلاث سنوات</option>
+            <option value="غير محددة (قابلة للتجديد التلقائي)">غير محددة (قابلة للتجديد التلقائي)</option>
+          </select>
+          <span class="error-msg" data-error-for="duration"></span>
+        </div>
+
+        <div class="field full">
+          <label for="notes">ملاحظات إضافية <span class="opt">(اختياري)</span></label>
+          <textarea id="notes" name="notes"></textarea>
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>الإقرار والاعتماد</legend>
+      <div class="ack-box">
+        <input type="checkbox" id="ack" name="ack" required>
+        <p><label for="ack" style="font-weight:600; display:inline;">أقر بصحة البيانات المدخلة، وبموافقة إدارة المركز مبدئيًا على التنسيق واستكمال إجراءات الاتفاقية الرسمية. <span class="req">*</span></label></p>
+      </div>
+      <span class="error-msg" data-error-for="ack"></span>
+    </fieldset>
+
+    <div class="actions">
+      <button type="submit" class="submit">إرسال البيانات</button>
+      <span class="status-hint">سيتم إشعارك فور استلام البيانات</span>
+    </div>
+  </form>
+
+  <div class="confirmation" id="confirmation">
+    <div class="icon">✓</div>
+    <h2>تم الإرسال بنجاح</h2>
+    <p>تم استلام بيانات المركز بنجاح، وسيتم التواصل معكم لاستكمال إجراءات التنسيق والاتفاقية بين المراكز الصحية المعنية.</p>
+  </div>
+
+  <section class="records">
+    <div class="records-head">
+      <h2>الردود المستلمة في هذا الجهاز</h2>
+      <span class="count" id="records-count">0 استجابة</span>
+    </div>
+    <div class="records-table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>التاريخ والوقت</th>
+            <th>المركز الصحي</th>
+            <th>القطاع</th>
+            <th>المدير</th>
+            <th>الجهة المقترحة</th>
+          </tr>
+        </thead>
+        <tbody id="records-body">
+          <tr class="empty-row"><td colspan="5">لا توجد استجابات محفوظة بعد</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div style="margin-top:14px; display:flex; justify-content:flex-end;">
+      <button type="button" class="export" id="export-btn">تصدير إلى Excel (CSV)</button>
+    </div>
+  </section>
+
+  <p class="disclosure">هذا النموذج نسخة عرض تفاعلية: الردود تُحفظ محليًا في متصفح هذا الجهاز فقط. لجمع ردود عدة مراكز مركزيًا، يُنشر النموذج عبر Microsoft Forms أو Google Forms أو نظام مركزي متصل بقاعدة بيانات.</p>
+</div>
+
+<script>
+  (function () {
+    var STORAGE_KEY = "coop-agreement-responses-v1";
+    var form = document.getElementById("agreement-form");
+    var confirmation = document.getElementById("confirmation");
+    var recordsBody = document.getElementById("records-body");
+    var recordsCount = document.getElementById("records-count");
+    var exportBtn = document.getElementById("export-btn");
+
+    function loadResponses() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function saveResponses(list) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+    }
+
+    function setError(name, message) {
+      var el = document.querySelector('[data-error-for="' + name + '"]');
+      if (el) el.textContent = message || "";
+    }
+
+    function markField(el, invalid) {
+      if (!el) return;
+      el.classList.toggle("invalid", !!invalid);
+    }
+
+    function digitsOnly(value) {
+      return /^[0-9]{9,15}$/.test(value.trim());
+    }
+
+    function validEmail(value) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
+    }
+
+    function renderRecords() {
+      var list = loadResponses();
+      recordsCount.textContent = list.length + " استجابة";
+      if (list.length === 0) {
+        recordsBody.innerHTML = '<tr class="empty-row"><td colspan="5">لا توجد استجابات محفوظة بعد</td></tr>';
+        return;
+      }
+      recordsBody.innerHTML = list
+        .slice()
+        .reverse()
+        .map(function (r) {
+          return (
+            "<tr>" +
+            "<td>" + r.timestamp + "</td>" +
+            "<td>" + escapeHtml(r["center-name"]) + "</td>" +
+            "<td>" + escapeHtml(r.sector) + "</td>" +
+            "<td>" + escapeHtml(r["manager-name"]) + "</td>" +
+            "<td>" + escapeHtml(r["partner-center"]) + "</td>" +
+            "</tr>"
+          );
+        })
+        .join("");
+    }
+
+    function escapeHtml(str) {
+      return String(str || "").replace(/[&<>"']/g, function (c) {
+        return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+      });
+    }
+
+    function toCsvValue(value) {
+      var v = String(value == null ? "" : value).replace(/"/g, '""');
+      return '"' + v + '"';
+    }
+
+    exportBtn.addEventListener("click", function () {
+      var list = loadResponses();
+      var headers = [
+        "التاريخ والوقت", "اسم المركز الصحي", "القطاع", "مدير المركز",
+        "رقم التواصل", "البريد الإلكتروني", "منسق الاتفاقية", "رقم المنسق",
+        "المركز المقترح", "مجال التعاون", "آلية التعاون", "مدة الاتفاقية", "ملاحظات"
+      ];
+      var rows = list.map(function (r) {
+        return [
+          r.timestamp, r["center-name"], r.sector, r["manager-name"],
+          r.phone, r.email, r["coordinator-name"], r["coordinator-phone"],
+          r["partner-center"], (r.scope || []).join(" / "), r.mechanism, r.duration, r.notes
+        ].map(toCsvValue).join(",");
+      });
+      var csv = "﻿" + headers.map(toCsvValue).join(",") + "\r\n" + rows.join("\r\n");
+      var blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement("a");
+      a.href = url;
+      a.download = "اتفاقية-المراكز-الصحية.csv";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var valid = true;
+
+      ["center-name", "manager-name", "phone", "email", "partner-center", "mechanism", "duration"].forEach(function (name) {
+        setError(name, "");
+        markField(form.elements[name], false);
+      });
+      setError("sector", "");
+      setError("scope", "");
+      setError("ack", "");
+
+      var centerName = form.elements["center-name"].value.trim();
+      if (!centerName) {
+        setError("center-name", "هذا الحقل إلزامي");
+        markField(form.elements["center-name"], true);
+        valid = false;
+      }
+
+      var sector = form.querySelector('input[name="sector"]:checked');
+      if (!sector) {
+        setError("sector", "الرجاء اختيار القطاع");
+        valid = false;
+      }
+
+      var managerName = form.elements["manager-name"].value.trim();
+      if (!managerName) {
+        setError("manager-name", "هذا الحقل إلزامي");
+        markField(form.elements["manager-name"], true);
+        valid = false;
+      }
+
+      var phone = form.elements["phone"].value.trim();
+      if (!phone) {
+        setError("phone", "هذا الحقل إلزامي");
+        markField(form.elements["phone"], true);
+        valid = false;
+      } else if (!digitsOnly(phone)) {
+        setError("phone", "الرجاء إدخال أرقام فقط (9 أرقام على الأقل)");
+        markField(form.elements["phone"], true);
+        valid = false;
+      }
+
+      var email = form.elements["email"].value.trim();
+      if (!email) {
+        setError("email", "هذا الحقل إلزامي");
+        markField(form.elements["email"], true);
+        valid = false;
+      } else if (!validEmail(email)) {
+        setError("email", "صيغة البريد الإلكتروني غير صحيحة");
+        markField(form.elements["email"], true);
+        valid = false;
+      }
+
+      var coordinatorPhone = form.elements["coordinator-phone"].value.trim();
+      if (coordinatorPhone && !digitsOnly(coordinatorPhone)) {
+        setError("coordinator-phone", "الرجاء إدخال أرقام فقط");
+        markField(form.elements["coordinator-phone"], true);
+        valid = false;
+      }
+
+      var partnerCenter = form.elements["partner-center"].value.trim();
+      if (!partnerCenter) {
+        setError("partner-center", "هذا الحقل إلزامي");
+        markField(form.elements["partner-center"], true);
+        valid = false;
+      }
+
+      var scopeChecks = Array.prototype.slice.call(form.querySelectorAll('input[name="scope"]:checked'));
+      if (scopeChecks.length === 0) {
+        setError("scope", "الرجاء اختيار مجال تعاون واحد على الأقل");
+        valid = false;
+      }
+
+      var mechanism = form.elements["mechanism"].value.trim();
+      if (!mechanism) {
+        setError("mechanism", "هذا الحقل إلزامي");
+        markField(form.elements["mechanism"], true);
+        valid = false;
+      }
+
+      var duration = form.elements["duration"].value;
+      if (!duration) {
+        setError("duration", "الرجاء اختيار مدة الاتفاقية");
+        markField(form.elements["duration"], true);
+        valid = false;
+      }
+
+      var ack = form.elements["ack"].checked;
+      if (!ack) {
+        setError("ack", "يجب تأكيد الإقرار قبل الإرسال");
+        valid = false;
+      }
+
+      if (!valid) {
+        var firstInvalid = form.querySelector(".invalid, .error-msg:not(:empty)");
+        if (firstInvalid && firstInvalid.scrollIntoView) {
+          firstInvalid.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+        return;
+      }
+
+      var record = {
+        timestamp: new Date().toLocaleString("ar-SA"),
+        "center-name": centerName,
+        sector: sector.value,
+        "manager-name": managerName,
+        phone: phone,
+        email: email,
+        "coordinator-name": form.elements["coordinator-name"].value.trim(),
+        "coordinator-phone": coordinatorPhone,
+        "partner-center": partnerCenter,
+        scope: scopeChecks.map(function (c) { return c.value; }),
+        mechanism: mechanism,
+        duration: duration,
+        notes: form.elements["notes"].value.trim()
+      };
+
+      var list = loadResponses();
+      list.push(record);
+      saveResponses(list);
+      renderRecords();
+
+      form.style.display = "none";
+      confirmation.classList.add("show");
+      confirmation.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+
+    renderRecords();
+  })();
+</script>
