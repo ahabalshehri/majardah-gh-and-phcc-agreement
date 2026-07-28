@@ -495,8 +495,8 @@
         </div>
 
         <div class="field">
-          <label for="coordinator-phone">رقم تواصل منسق الاتفاقية <span class="opt">(اختياري)</span></label>
-          <input type="tel" id="coordinator-phone" name="coordinator-phone" inputmode="numeric" placeholder="05xxxxxxxx">
+          <label for="coordinator-phone">رقم تواصل منسق الاتفاقية <span class="req">*</span></label>
+          <input type="tel" id="coordinator-phone" name="coordinator-phone" inputmode="numeric" placeholder="05xxxxxxxx" required>
           <span class="error-msg" data-error-for="coordinator-phone"></span>
         </div>
       </div>
@@ -519,24 +519,6 @@
           </div>
           <span class="hint">يمكن اختيار برنامج عينتي فقط، أو إضافة برنامج الزواج الصحي معه</span>
           <span class="error-msg" data-error-for="scope"></span>
-        </div>
-
-        <div class="field full">
-          <label for="mechanism">تفاصيل وآلية التعاون المقترحة <span class="req">*</span></label>
-          <textarea id="mechanism" name="mechanism" required></textarea>
-          <span class="error-msg" data-error-for="mechanism"></span>
-        </div>
-
-        <div class="field full">
-          <label for="duration">مدة الاتفاقية المقترحة <span class="req">*</span></label>
-          <select id="duration" name="duration" required>
-            <option value="" disabled selected>اختر المدة</option>
-            <option value="سنة واحدة">سنة واحدة</option>
-            <option value="سنتان">سنتان</option>
-            <option value="ثلاث سنوات">ثلاث سنوات</option>
-            <option value="غير محددة (قابلة للتجديد التلقائي)">غير محددة (قابلة للتجديد التلقائي)</option>
-          </select>
-          <span class="error-msg" data-error-for="duration"></span>
         </div>
 
         <div class="field full">
@@ -603,7 +585,7 @@
       e.preventDefault();
       var valid = true;
 
-      ["center-name", "manager-name", "phone", "email", "partner-center", "mechanism", "duration"].forEach(function (name) {
+      ["center-name", "manager-name", "phone", "email", "coordinator-phone", "partner-center"].forEach(function (name) {
         setError(name, "");
         markField(form.elements[name], false);
       });
@@ -654,7 +636,11 @@
       }
 
       var coordinatorPhone = form.elements["coordinator-phone"].value.trim();
-      if (coordinatorPhone && !digitsOnly(coordinatorPhone)) {
+      if (!coordinatorPhone) {
+        setError("coordinator-phone", "هذا الحقل إلزامي");
+        markField(form.elements["coordinator-phone"], true);
+        valid = false;
+      } else if (!digitsOnly(coordinatorPhone)) {
         setError("coordinator-phone", "الرجاء إدخال أرقام فقط");
         markField(form.elements["coordinator-phone"], true);
         valid = false;
@@ -670,20 +656,6 @@
       var scopeChecks = Array.prototype.slice.call(form.querySelectorAll('input[name="scope"]:checked'));
       if (scopeChecks.length === 0) {
         setError("scope", "الرجاء اختيار مجال تعاون واحد على الأقل");
-        valid = false;
-      }
-
-      var mechanism = form.elements["mechanism"].value.trim();
-      if (!mechanism) {
-        setError("mechanism", "هذا الحقل إلزامي");
-        markField(form.elements["mechanism"], true);
-        valid = false;
-      }
-
-      var duration = form.elements["duration"].value;
-      if (!duration) {
-        setError("duration", "الرجاء اختيار مدة الاتفاقية");
-        markField(form.elements["duration"], true);
         valid = false;
       }
 
@@ -712,8 +684,6 @@
         "coordinator-phone": coordinatorPhone,
         "partner-center": partnerCenter,
         scope: scopeChecks.map(function (c) { return c.value; }),
-        mechanism: mechanism,
-        duration: duration,
         notes: form.elements["notes"].value.trim()
       };
 
