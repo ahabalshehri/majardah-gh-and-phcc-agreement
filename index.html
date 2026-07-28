@@ -1,4 +1,5 @@
 <title>نموذج بيانات الاتفاقية بين مستشفى المجاردة العام والمراكز الصحية</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
   :root {
     --bg: #f4f8fb;
@@ -454,6 +455,12 @@
     fieldset { padding: 20px 18px 22px; }
     header.intro { padding: 22px 20px; }
     .banner-title { font-size: 16.5px; }
+    .actions { flex-direction: column; align-items: stretch; gap: 10px; }
+    .actions .status-hint { text-align: center; }
+    button.submit { width: 100%; }
+    input[type="text"], input[type="tel"], input[type="email"], select, textarea {
+      font-size: 16px;
+    }
   }
 
   @media (prefers-reduced-motion: reduce) {
