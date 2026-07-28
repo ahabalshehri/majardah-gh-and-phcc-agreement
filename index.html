@@ -182,12 +182,11 @@
     box-shadow: var(--shadow);
   }
 
-  legend {
+  .legend {
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 0 6px;
-    margin-bottom: 4px;
+    margin: 0 0 18px;
     font-size: 16px;
     font-weight: 700;
     color: var(--text);
@@ -211,7 +210,6 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 18px 20px;
-    margin-top: 18px;
   }
 
   .field {
@@ -342,7 +340,6 @@
     border: 1px solid var(--primary);
     border-radius: 10px;
     padding: 16px 18px;
-    margin-top: 16px;
   }
 
   .ack-box input {
@@ -492,7 +489,7 @@
 
   <form id="agreement-form" novalidate>
     <fieldset>
-      <legend><span class="legend-num">١</span> بيانات المركز الصحي</legend>
+      <div class="legend"><span class="legend-num">١</span> بيانات المركز الصحي</div>
       <div class="field-grid">
         <div class="field full">
           <label for="center-name">اسم المركز الصحي <span class="req">*</span></label>
@@ -518,7 +515,7 @@
     </fieldset>
 
     <fieldset>
-      <legend><span class="legend-num">٢</span> بيانات التواصل</legend>
+      <div class="legend"><span class="legend-num">٢</span> بيانات التواصل</div>
       <div class="field-grid">
         <div class="field">
           <label for="phone">رقم التواصل <span class="req">*</span></label>
@@ -547,7 +544,7 @@
     </fieldset>
 
     <fieldset>
-      <legend><span class="legend-num">٣</span> بيانات الاتفاقية المقترحة</legend>
+      <div class="legend"><span class="legend-num">٣</span> بيانات الاتفاقية المقترحة</div>
       <div class="field-grid">
         <div class="field full">
           <label for="partner-center">اسم المركز الصحي المقترح عمل الاتفاقية معه <span class="req">*</span></label>
@@ -573,7 +570,7 @@
     </fieldset>
 
     <fieldset>
-      <legend><span class="legend-num">٤</span> الإقرار والاعتماد</legend>
+      <div class="legend"><span class="legend-num">٤</span> الإقرار والاعتماد</div>
       <div class="ack-box">
         <input type="checkbox" id="ack" name="ack" required>
         <p><label for="ack" style="font-weight:600; display:inline;">أقر بصحة البيانات المدخلة، وبموافقة إدارة المركز مبدئيًا على التنسيق واستكمال إجراءات الاتفاقية الرسمية. <span class="req">*</span></label></p>
