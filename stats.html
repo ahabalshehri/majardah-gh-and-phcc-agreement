@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>نسبة استلام بيانات المراكز الصحية</title>
+<title>نسبة استلام بيانات المراكز الصحية لعمل اتفاقيات مع المختبر</title>
 <style>
   @font-face {
     font-family: "Cairo";
@@ -149,7 +149,7 @@
 </head>
 <body>
   <div class="page">
-    <h1>نسبة استلام بيانات المراكز الصحية</h1>
+    <h1>نسبة استلام بيانات المراكز الصحية لعمل اتفاقيات مع المختبر</h1>
     <div class="card-wrap">
       <canvas id="card" width="1080" height="1410"></canvas>
       <p class="status-line" id="status-line">جارٍ التحميل...</p>
@@ -339,6 +339,9 @@
       ctx.fillStyle = COLORS.text;
       ctx.font = "700 36px 'Cairo', 'Segoe UI', Tahoma, Arial, sans-serif";
       ctx.fillText("نسبة استلام بيانات المراكز الصحية", W / 2, bannerH + 112);
+      ctx.font = "700 30px 'Cairo', 'Segoe UI', Tahoma, Arial, sans-serif";
+      ctx.fillStyle = COLORS.muted;
+      ctx.fillText("لعمل اتفاقيات مع المختبر", W / 2, bannerH + 156);
 
       // overall ring
       var ringCx = W / 2, ringCy = bannerH + 340, ringR = 175;
