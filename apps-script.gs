@@ -1,27 +1,27 @@
 var TRACKING_SHEET_NAME = "قائمة المتابعة";
 
 var PHCC_LIST = [
-  { sector: "بارق", name: "Bariq PHCC" },
-  { sector: "بارق", name: "Alkush" },
-  { sector: "بارق", name: "Suhool PHCC" },
-  { sector: "بارق", name: "Wadi Alkair PHCC" },
-  { sector: "بارق", name: "Dhuha Sayala PHCC" },
-  { sector: "بارق", name: "Thalooth Almandhar PHCC" },
-  { sector: "بارق", name: "Sulaem PHCC" },
-  { sector: "بارق", name: "Alqureha PHCC" },
-  { sector: "بارق", name: "Jumat Rabia Almaqatra" },
-  { sector: "بارق", name: "Almaslama PHCC" },
-  { sector: "بارق", name: "South Bariq PHCC" },
-  { sector: "بارق", name: "Khulsat Nusba PHCC" },
-  { sector: "المجاردة", name: "Almajardah PHCC" },
-  { sector: "المجاردة", name: "North Tharban" },
-  { sector: "المجاردة", name: "Ahad Tharban PHCC" },
-  { sector: "المجاردة", name: "Khat PHCC" },
-  { sector: "المجاردة", name: "Altalalea PHCC" },
-  { sector: "المجاردة", name: "Abss PHCC" },
-  { sector: "المجاردة", name: "Khatba PHCC" },
-  { sector: "المجاردة", name: "East Almajardah" },
-  { sector: "المجاردة", name: "Al Ghaylan PHCC" }
+  { sector: "بارق", nameEn: "Bariq PHCC", nameAr: "مركز بارق الصحي" },
+  { sector: "بارق", nameEn: "Alkush", nameAr: "مركز الكوش الصحي" },
+  { sector: "بارق", nameEn: "Suhool PHCC", nameAr: "مركز سهول الصحي" },
+  { sector: "بارق", nameEn: "Wadi Alkair PHCC", nameAr: "مركز وادي الخير الصحي" },
+  { sector: "بارق", nameEn: "Dhuha Sayala PHCC", nameAr: "مركز ضحى سيالة الصحي" },
+  { sector: "بارق", nameEn: "Thalooth Almandhar PHCC", nameAr: "مركز ثلوث المنذر الصحي" },
+  { sector: "بارق", nameEn: "Sulaem PHCC", nameAr: "مركز سليم الصحي" },
+  { sector: "بارق", nameEn: "Alqureha PHCC", nameAr: "مركز القريحاء الصحي" },
+  { sector: "بارق", nameEn: "Jumat Rabia Almaqatra", nameAr: "مركز جمعة ربيعة المقطرة الصحي" },
+  { sector: "بارق", nameEn: "Almaslama PHCC", nameAr: "مركز المسلمة الصحي" },
+  { sector: "بارق", nameEn: "South Bariq PHCC", nameAr: "مركز جنوب بارق الصحي" },
+  { sector: "بارق", nameEn: "Khulsat Nusba PHCC", nameAr: "مركز خلصة نصبة الصحي" },
+  { sector: "المجاردة", nameEn: "Almajardah PHCC", nameAr: "مركز المجاردة الصحي" },
+  { sector: "المجاردة", nameEn: "North Tharban", nameAr: "مركز شمال ثربان الصحي" },
+  { sector: "المجاردة", nameEn: "Ahad Tharban PHCC", nameAr: "مركز أحد ثربان الصحي" },
+  { sector: "المجاردة", nameEn: "Khat PHCC", nameAr: "مركز الخط الصحي" },
+  { sector: "المجاردة", nameEn: "Altalalea PHCC", nameAr: "مركز التلاعة الصحي" },
+  { sector: "المجاردة", nameEn: "Abss PHCC", nameAr: "مركز عبس الصحي" },
+  { sector: "المجاردة", nameEn: "Khatba PHCC", nameAr: "مركز خطبة الصحي" },
+  { sector: "المجاردة", nameEn: "East Almajardah", nameAr: "مركز شرق المجاردة الصحي" },
+  { sector: "المجاردة", nameEn: "Al Ghaylan PHCC", nameAr: "مركز الغيلان الصحي" }
 ];
 
 function doPost(e) {
@@ -70,21 +70,21 @@ function ensureTrackingSheet(responsesSheetName) {
   if (sheet) return sheet;
 
   sheet = ss.insertSheet(TRACKING_SHEET_NAME);
-  sheet.appendRow(["م", "القطاع", "اسم المركز الصحي (للمطابقة)", "عدد الردود المطابقة", "الحالة"]);
-  sheet.getRange(1, 1, 1, 5).setFontWeight("bold");
+  sheet.appendRow(["م", "القطاع", "الاسم بالإنجليزية", "اسم المركز الصحي (للمطابقة)", "عدد الردود المطابقة", "الحالة"]);
+  sheet.getRange(1, 1, 1, 6).setFontWeight("bold");
 
   PHCC_LIST.forEach(function (center, i) {
     var row = i + 2;
-    sheet.appendRow([i + 1, center.sector, center.name, "", ""]);
-    sheet.getRange(row, 4).setFormula(
-      "=COUNTIF('" + responsesSheetName + "'!B:B,\"*\"&C" + row + "&\"*\")"
-    );
+    sheet.appendRow([i + 1, center.sector, center.nameEn, center.nameAr, "", ""]);
     sheet.getRange(row, 5).setFormula(
-      "=IF(D" + row + ">0,\"✅ تم الاستلام\",\"⏳ بالانتظار\")"
+      "=COUNTIF('" + responsesSheetName + "'!B:B,\"*\"&D" + row + "&\"*\")"
+    );
+    sheet.getRange(row, 6).setFormula(
+      "=IF(E" + row + ">0,\"✅ تم الاستلام\",\"⏳ بالانتظار\")"
     );
   });
 
   sheet.setFrozenRows(1);
-  sheet.autoResizeColumns(1, 5);
+  sheet.autoResizeColumns(1, 6);
   return sheet;
 }
