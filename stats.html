@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>نسبة استلام بيانات المراكز الصحية</title>
+<style>
+  :root {
+    --bg: #f4f8fb;
+    --surface: #ffffff;
+    --surface-2: #eaf2f8;
+    --text: #142430;
+    --text-muted: #5c7080;
+    --border: #dbe6ee;
+    --primary: #1c7fc4;
+    --primary-dark: #0f5a91;
+    --primary-tint: #e3f2fb;
+    --danger: #b3261e;
+    --danger-tint: #fbeceb;
+    --shadow: 0 1px 2px rgba(15, 35, 50, 0.05), 0 8px 24px rgba(15, 35, 50, 0.07);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0c161f;
+      --surface: #12212c;
+      --surface-2: #182c39;
+      --text: #e7f0f5;
+      --text-muted: #92aab8;
+      --border: #223c4c;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.35);
+    }
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text);
+  }
+
+  body {
+    font-family: "Segoe UI", Tahoma, "Noto Kufi Arabic", Arial, sans-serif;
+    line-height: 1.6;
+    padding: 32px 16px 60px;
+  }
+
+  .page {
+    max-width: 520px;
+    margin: 0 auto;
+  }
+
+  h1 {
+    font-size: 19px;
+    margin: 0 0 20px;
+    text-align: center;
+  }
+
+  .card-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: var(--shadow);
+  }
+
+  canvas {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 10px;
+  }
+
+  .status-line {
+    text-align: center;
+    font-size: 13px;
+    color: var(--text-muted);
+    margin: 14px 0 0;
+    min-height: 18px;
+  }
+
+  .status-line.error {
+    color: var(--danger);
+  }
+
+  .actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 18px;
+    flex-wrap: wrap;
+  }
+
+  button {
+    font: inherit;
+    font-size: 14.5px;
+    font-weight: 700;
+    border: none;
+    border-radius: 10px;
+    padding: 12px 18px;
+    cursor: pointer;
+    flex: 1 1 auto;
+  }
+
+  .btn-primary {
+    color: #fff;
+    background: linear-gradient(155deg, var(--primary), var(--primary-dark));
+  }
+
+  .btn-secondary {
+    color: var(--primary-dark);
+    background: var(--primary-tint);
+    border: 1px solid var(--primary);
+  }
+
+  button:disabled {
+    opacity: 0.6;
+    cursor: progress;
+  }
+
+  .back-link {
+    display: block;
+    text-align: center;
+    margin-top: 22px;
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+</style>
+</head>
+<body>
+  <div class="page">
+    <h1>نسبة استلام بيانات المراكز الصحية</h1>
+    <div class="card-wrap">
+      <canvas id="card" width="1080" height="1080"></canvas>
+      <p class="status-line" id="status-line">جارٍ التحميل...</p>
+    </div>
+    <div class="actions">
+      <button type="button" class="btn-primary" id="download-btn" disabled>تنزيل الصورة</button>
+      <button type="button" class="btn-secondary" id="refresh-btn">تحديث</button>
+    </div>
+    <a class="back-link" href="index.html">العودة إلى نموذج البيانات</a>
+  </div>
+
+<script>
+  (function () {
+    var STATS_URL = "https://script.google.com/macros/s/AKfycbw2z67aOagAi1auvG4Yv9mjfhvl-yWoW5-URDI1JCcHcf6RS8-sGU6wjYLeswIHAtWrzA/exec";
+
+    var canvas = document.getElementById("card");
+    var ctx = canvas.getContext("2d");
+    var statusLine = document.getElementById("status-line");
+    var downloadBtn = document.getElementById("download-btn");
+    var refreshBtn = document.getElementById("refresh-btn");
+
+    var COLORS = {
+      bannerFrom: "#0f5a91",
+      bannerTo: "#1c7fc4",
+      bg: "#f4f8fb",
+      surface: "#ffffff",
+      text: "#142430",
+      muted: "#5c7080",
+      track: "#e3f2fb",
+      ring: "#1c7fc4",
+      ringBariq: "#1c7fc4",
+      ringMajardah: "#0f5a91"
+    };
+
+    function drawRoundedRect(x, y, w, h, r) {
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.arcTo(x + w, y, x + w, y + h, r);
+      ctx.arcTo(x + w, y + h, x, y + h, r);
+      ctx.arcTo(x, y + h, x, y, r);
+      ctx.arcTo(x, y, x + w, y, r);
+      ctx.closePath();
+    }
+
+    function drawArc(cx, cy, radius, lineWidth, percentage, color, trackColor) {
+      ctx.lineCap = "round";
+      ctx.lineWidth = lineWidth;
+
+      ctx.strokeStyle = trackColor;
+      ctx.beginPath();
+      ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+      ctx.stroke();
+
+      var start = -Math.PI / 2;
+      var end = start + (Math.PI * 2 * (percentage / 100));
+      ctx.strokeStyle = color;
+      ctx.beginPath();
+      ctx.arc(cx, cy, radius, start, end);
+      ctx.stroke();
+    }
+
+    function drawBar(x, y, w, h, percentage, color, trackColor) {
+      drawRoundedRect(x, y, w, h, h / 2);
+      ctx.fillStyle = trackColor;
+      ctx.fill();
+
+      var fillW = Math.max(h, w * (percentage / 100));
+      drawRoundedRect(x, y, fillW, h, h / 2);
+      ctx.fillStyle = color;
+      ctx.fill();
+    }
+
+    function render(stats) {
+      var W = canvas.width, H = canvas.height;
+      ctx.direction = "rtl";
+      ctx.clearRect(0, 0, W, H);
+
+      // background
+      ctx.fillStyle = COLORS.bg;
+      ctx.fillRect(0, 0, W, H);
+
+      // banner
+      var bannerH = 170;
+      var grad = ctx.createLinearGradient(0, 0, W, bannerH);
+      grad.addColorStop(0, COLORS.bannerFrom);
+      grad.addColorStop(1, COLORS.bannerTo);
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, W, bannerH);
+
+      ctx.fillStyle = "#ffffff";
+      ctx.textAlign = "center";
+      ctx.font = "700 34px 'Segoe UI', Tahoma, Arial, sans-serif";
+      ctx.fillText("تجمع عسير الصحي", W / 2, 78);
+      ctx.font = "400 24px 'Segoe UI', Tahoma, Arial, sans-serif";
+      ctx.globalAlpha = 0.9;
+      ctx.fillText("مستشفى المجاردة العام", W / 2, 118);
+      ctx.globalAlpha = 1;
+
+      // title
+      ctx.fillStyle = COLORS.text;
+      ctx.font = "700 32px 'Segoe UI', Tahoma, Arial, sans-serif";
+      ctx.fillText("نسبة استلام بيانات المراكز الصحية", W / 2, bannerH + 70);
+
+      // overall ring
+      var ringCx = W / 2, ringCy = 470, ringR = 190;
+      drawArc(ringCx, ringCy, ringR, 34, stats.percentage, COLORS.ring, COLORS.track);
+
+      ctx.fillStyle = COLORS.text;
+      ctx.font = "700 96px 'Segoe UI', Tahoma, Arial, sans-serif";
+      ctx.fillText(stats.percentage + "%", ringCx, ringCy + 30);
+
+      ctx.fillStyle = COLORS.muted;
+      ctx.font = "400 30px 'Segoe UI', Tahoma, Arial, sans-serif";
+      ctx.fillText(stats.submitted + " من " + stats.total + " مركزًا", ringCx, ringCy + 80);
+
+      // sector breakdown
+      var bariq = stats.sectors["بارق"] || { total: 0, submitted: 0, percentage: 0 };
+      var majardah = stats.sectors["المجاردة"] || { total: 0, submitted: 0, percentage: 0 };
+
+      var sectionY = 760;
+      var barX = 90, barW = W - 180, barH = 26;
+      var rowGap = 130;
+
+      ctx.textAlign = "right";
+      ctx.fillStyle = COLORS.text;
+      ctx.font = "700 30px 'Segoe UI', Tahoma, Arial, sans-serif";
+      ctx.fillText("قطاع بارق", W - barX, sectionY);
+      ctx.textAlign = "left";
+      ctx.fillStyle = COLORS.muted;
+      ctx.font = "400 26px 'Segoe UI', Tahoma, Arial, sans-serif";
+      ctx.fillText(bariq.submitted + " / " + bariq.total + " (" + bariq.percentage + "%)", barX, sectionY);
+      drawBar(barX, sectionY + 20, barW, barH, bariq.percentage, COLORS.ringBariq, COLORS.track);
+
+      var sectionY2 = sectionY + rowGap;
+      ctx.textAlign = "right";
+      ctx.fillStyle = COLORS.text;
+      ctx.font = "700 30px 'Segoe UI', Tahoma, Arial, sans-serif";
+      ctx.fillText("قطاع المجاردة", W - barX, sectionY2);
+      ctx.textAlign = "left";
+      ctx.fillStyle = COLORS.muted;
+      ctx.font = "400 26px 'Segoe UI', Tahoma, Arial, sans-serif";
+      ctx.fillText(majardah.submitted + " / " + majardah.total + " (" + majardah.percentage + "%)", barX, sectionY2);
+      drawBar(barX, sectionY2 + 20, barW, barH, majardah.percentage, COLORS.ringMajardah, COLORS.track);
+
+      // footer
+      var updated = new Date(stats.updatedAt);
+      var updatedText = "محدث حتى " + updated.toLocaleString("ar-SA", { dateStyle: "medium", timeStyle: "short" });
+      ctx.textAlign = "center";
+      ctx.fillStyle = COLORS.muted;
+      ctx.font = "400 22px 'Segoe UI', Tahoma, Arial, sans-serif";
+      ctx.fillText(updatedText, W / 2, H - 40);
+    }
+
+    function setStatus(text, isError) {
+      statusLine.textContent = text;
+      statusLine.classList.toggle("error", !!isError);
+    }
+
+    function load() {
+      setStatus("جارٍ التحميل...");
+      downloadBtn.disabled = true;
+      refreshBtn.disabled = true;
+
+      fetch(STATS_URL)
+        .then(function (r) {
+          if (!r.ok) throw new Error("bad status " + r.status);
+          return r.json();
+        })
+        .then(function (stats) {
+          render(stats);
+          setStatus("تم التحديث بنجاح");
+          downloadBtn.disabled = false;
+        })
+        .catch(function (err) {
+          setStatus("تعذّر تحميل البيانات. الرجاء المحاولة مرة أخرى.", true);
+        })
+        .finally(function () {
+          refreshBtn.disabled = false;
+        });
+    }
+
+    downloadBtn.addEventListener("click", function () {
+      var link = document.createElement("a");
+      link.download = "نسبة-استلام-البيانات.png";
+      link.href = canvas.toDataURL("image/png");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    });
+
+    refreshBtn.addEventListener("click", load);
+
+    load();
+  })();
+</script>
+</body>
+</html>

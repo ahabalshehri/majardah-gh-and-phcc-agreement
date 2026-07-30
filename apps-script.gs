@@ -57,6 +57,45 @@ function doPost(e) {
     .setMimeType(ContentService.MimeType.JSON);
 }
 
+function doGet(e) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName(TRACKING_SHEET_NAME);
+  if (!sheet) {
+    var responsesSheet = ss.getSheets()[0];
+    sheet = ensureTrackingSheet(responsesSheet.getName());
+  }
+
+  var lastRow = sheet.getLastRow();
+  var stats = { total: 0, submitted: 0, sectors: {}, updatedAt: new Date().toISOString() };
+
+  if (lastRow > 1) {
+    var rows = sheet.getRange(2, 2, lastRow - 1, 5).getValues();
+    rows.forEach(function (row) {
+      var sector = row[0];
+      var count = row[3];
+      if (!stats.sectors[sector]) {
+        stats.sectors[sector] = { total: 0, submitted: 0 };
+      }
+      stats.total++;
+      stats.sectors[sector].total++;
+      if (count > 0) {
+        stats.submitted++;
+        stats.sectors[sector].submitted++;
+      }
+    });
+  }
+
+  stats.percentage = stats.total ? Math.round((stats.submitted / stats.total) * 100) : 0;
+  Object.keys(stats.sectors).forEach(function (name) {
+    var s = stats.sectors[name];
+    s.percentage = s.total ? Math.round((s.submitted / s.total) * 100) : 0;
+  });
+
+  return ContentService
+    .createTextOutput(JSON.stringify(stats))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
 // Run this once manually (Apps Script editor: select this function, then Run)
 // to create the tracking tab immediately without waiting for a submission.
 function setupTrackingSheet() {
