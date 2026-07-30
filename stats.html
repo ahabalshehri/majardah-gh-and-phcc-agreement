@@ -151,7 +151,7 @@
   <div class="page">
     <h1>نسبة استلام بيانات المراكز الصحية لعمل اتفاقيات مع المختبر</h1>
     <div class="card-wrap">
-      <canvas id="card" width="1080" height="1410"></canvas>
+      <canvas id="card" width="1080" height="1500"></canvas>
       <p class="status-line" id="status-line">جارٍ التحميل...</p>
     </div>
     <div class="actions">
@@ -344,7 +344,7 @@
       ctx.fillText("لعمل اتفاقيات مع المختبر", W / 2, bannerH + 156);
 
       // overall ring
-      var ringCx = W / 2, ringCy = bannerH + 340, ringR = 175;
+      var ringCx = W / 2, ringCy = bannerH + 420, ringR = 175;
       ctx.save();
       ctx.shadowColor = "rgba(28, 127, 196, 0.18)";
       ctx.shadowBlur = 24;
@@ -361,7 +361,7 @@
       ctx.fillText(stats.submitted + " من " + stats.total + " مركزًا صحيًا", ringCx, ringCy + 86);
 
       // divider
-      var dividerY = bannerH + 560;
+      var dividerY = bannerH + 640;
       ctx.strokeStyle = COLORS.divider;
       ctx.lineWidth = 2;
       ctx.beginPath();
