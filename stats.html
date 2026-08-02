@@ -197,6 +197,15 @@
       shareBtn.style.display = "none";
     }
 
+    var lastStats = null;
+
+    function formatDateTime(iso) {
+      var d = new Date(iso);
+      var pad = function (n) { return (n < 10 ? "0" : "") + n; };
+      return pad(d.getDate()) + "/" + pad(d.getMonth() + 1) + "/" + d.getFullYear() +
+        " " + pad(d.getHours()) + ":" + pad(d.getMinutes());
+    }
+
     var COLORS = {
       bannerFrom: "#0f5a91",
       bannerTo: "#1c7fc4",
@@ -432,6 +441,7 @@
         fontsReady
       ])
         .then(function (results) {
+          lastStats = results[0];
           render(results[0], results[1]);
           cardImg.src = canvas.toDataURL("image/png");
           setStatus("تم التحديث بنجاح");
@@ -451,11 +461,15 @@
       canvas.toBlob(function (blob) {
         if (!blob) { shareBtn.disabled = false; return; }
         var file = new File([blob], "نسبة-استلام-البيانات.png", { type: "image/png" });
+        var shareText = "نسبة استلام بيانات المراكز الصحية لعمل اتفاقيات مع المختبر";
+        if (lastStats && lastStats.updatedAt) {
+          shareText += "\nآخر تحديث: " + formatDateTime(lastStats.updatedAt);
+        }
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
           navigator.share({
             files: [file],
             title: "نسبة استلام بيانات المراكز الصحية",
-            text: "نسبة استلام بيانات المراكز الصحية لعمل اتفاقيات مع المختبر"
+            text: shareText
           })
             .catch(function () {})
             .finally(function () { shareBtn.disabled = false; });
