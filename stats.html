@@ -84,12 +84,24 @@
     box-shadow: var(--shadow);
   }
 
-  canvas {
+  canvas, #card-img {
     width: 100%;
     height: auto;
     display: block;
     border-radius: 10px;
     background: var(--surface);
+  }
+
+  #card-img {
+    min-height: 40px;
+  }
+
+  .hint-line {
+    text-align: center;
+    font-size: 13px;
+    color: var(--text-muted);
+    margin: 14px 4px 0;
+    line-height: 1.6;
   }
 
   .status-line {
@@ -151,12 +163,17 @@
   <div class="page">
     <h1>نسبة استلام بيانات المراكز الصحية لعمل اتفاقيات مع المختبر</h1>
     <div class="card-wrap">
-      <canvas id="card" width="1080" height="1500"></canvas>
+      <canvas id="card" width="1080" height="1500" style="display:none;"></canvas>
+      <img id="card-img" alt="نسبة استلام بيانات المراكز الصحية لعمل اتفاقيات مع المختبر">
       <p class="status-line" id="status-line">جارٍ التحميل...</p>
     </div>
+    <p class="hint-line" id="hint-line">أو اضغط مطولًا على الصورة واختر "حفظ الصورة" أو "مشاركة".</p>
     <div class="actions">
-      <button type="button" class="btn-primary" id="download-btn" disabled>تنزيل الصورة</button>
-      <button type="button" class="btn-secondary" id="refresh-btn">تحديث</button>
+      <button type="button" class="btn-primary" id="share-btn" disabled>مشاركة / حفظ الصورة</button>
+      <button type="button" class="btn-secondary" id="download-btn" disabled>تنزيل (حاسوب)</button>
+    </div>
+    <div class="actions">
+      <button type="button" class="btn-secondary" id="refresh-btn" style="flex:1 1 100%;">تحديث</button>
     </div>
     <a class="back-link" href="index.html">العودة إلى نموذج البيانات</a>
   </div>
@@ -168,9 +185,17 @@
 
     var canvas = document.getElementById("card");
     var ctx = canvas.getContext("2d");
+    var cardImg = document.getElementById("card-img");
     var statusLine = document.getElementById("status-line");
+    var hintLine = document.getElementById("hint-line");
+    var shareBtn = document.getElementById("share-btn");
     var downloadBtn = document.getElementById("download-btn");
     var refreshBtn = document.getElementById("refresh-btn");
+
+    var canShareFiles = !!(navigator.canShare && window.File);
+    if (!canShareFiles) {
+      shareBtn.style.display = "none";
+    }
 
     var COLORS = {
       bannerFrom: "#0f5a91",
@@ -395,6 +420,7 @@
     function load() {
       setStatus("جارٍ التحميل...");
       downloadBtn.disabled = true;
+      shareBtn.disabled = true;
       refreshBtn.disabled = true;
 
       Promise.all([
@@ -407,8 +433,10 @@
       ])
         .then(function (results) {
           render(results[0], results[1]);
+          cardImg.src = canvas.toDataURL("image/png");
           setStatus("تم التحديث بنجاح");
           downloadBtn.disabled = false;
+          if (canShareFiles) shareBtn.disabled = false;
         })
         .catch(function () {
           setStatus("تعذّر تحميل البيانات. الرجاء المحاولة مرة أخرى.", true);
@@ -417,6 +445,25 @@
           refreshBtn.disabled = false;
         });
     }
+
+    shareBtn.addEventListener("click", function () {
+      shareBtn.disabled = true;
+      canvas.toBlob(function (blob) {
+        if (!blob) { shareBtn.disabled = false; return; }
+        var file = new File([blob], "نسبة-استلام-البيانات.png", { type: "image/png" });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          navigator.share({
+            files: [file],
+            title: "نسبة استلام بيانات المراكز الصحية",
+            text: "نسبة استلام بيانات المراكز الصحية لعمل اتفاقيات مع المختبر"
+          })
+            .catch(function () {})
+            .finally(function () { shareBtn.disabled = false; });
+        } else {
+          shareBtn.disabled = false;
+        }
+      }, "image/png");
+    });
 
     downloadBtn.addEventListener("click", function () {
       var link = document.createElement("a");
