@@ -66,21 +66,25 @@ function doGet(e) {
   }
 
   var lastRow = sheet.getLastRow();
-  var stats = { total: 0, submitted: 0, sectors: {}, updatedAt: new Date().toISOString() };
+  var stats = { total: 0, submitted: 0, sectors: {}, pending: {}, updatedAt: new Date().toISOString() };
 
   if (lastRow > 1) {
     var rows = sheet.getRange(2, 2, lastRow - 1, 5).getValues();
     rows.forEach(function (row) {
       var sector = row[0];
+      var nameAr = row[2];
       var count = row[3];
       if (!stats.sectors[sector]) {
         stats.sectors[sector] = { total: 0, submitted: 0 };
+        stats.pending[sector] = [];
       }
       stats.total++;
       stats.sectors[sector].total++;
       if (count > 0) {
         stats.submitted++;
         stats.sectors[sector].submitted++;
+      } else {
+        stats.pending[sector].push(nameAr);
       }
     });
   }

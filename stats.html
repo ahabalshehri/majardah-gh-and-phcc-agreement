@@ -157,6 +157,72 @@
     font-size: 13px;
     color: var(--text-muted);
   }
+
+  .pending-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: var(--shadow);
+    margin-top: 22px;
+  }
+
+  .pending-wrap h2 {
+    font-size: 16px;
+    margin: 0 0 12px;
+  }
+
+  .pending-content {
+    font-size: 14px;
+    line-height: 1.9;
+  }
+
+  .pending-sector {
+    margin-bottom: 14px;
+  }
+
+  .pending-sector:last-child {
+    margin-bottom: 0;
+  }
+
+  .pending-sector-title {
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+
+  .pending-sector-title .count {
+    font-weight: 400;
+    color: var(--text-muted);
+    font-size: 13px;
+  }
+
+  .pending-list {
+    margin: 0;
+    padding-inline-start: 22px;
+  }
+
+  .pending-done {
+    color: var(--text-muted);
+  }
+
+  .btn-whatsapp {
+    font: inherit;
+    font-size: 14.5px;
+    font-weight: 700;
+    color: #fff;
+    background: #25D366;
+    border: none;
+    border-radius: 10px;
+    padding: 12px 18px;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 16px;
+  }
+
+  .btn-whatsapp:disabled {
+    opacity: 0.6;
+    cursor: progress;
+  }
 </style>
 </head>
 <body>
@@ -175,6 +241,13 @@
     <div class="actions">
       <button type="button" class="btn-secondary" id="refresh-btn" style="flex:1 1 100%;">تحديث</button>
     </div>
+
+    <div class="pending-wrap">
+      <h2>المراكز المتأخرة عن الإرسال</h2>
+      <div id="pending-content" class="pending-content">جارٍ التحميل...</div>
+      <button type="button" class="btn-whatsapp" id="whatsapp-btn" disabled>مشاركة القائمة عبر واتساب</button>
+    </div>
+
     <a class="back-link" href="index.html">العودة إلى نموذج البيانات</a>
   </div>
 
@@ -191,6 +264,9 @@
     var shareBtn = document.getElementById("share-btn");
     var downloadBtn = document.getElementById("download-btn");
     var refreshBtn = document.getElementById("refresh-btn");
+    var pendingContent = document.getElementById("pending-content");
+    var whatsappBtn = document.getElementById("whatsapp-btn");
+    var FORM_URL = "https://ahabalshehri.github.io/majardah-gh-and-phcc-agreement/";
 
     var canShareFiles = !!(navigator.canShare && window.File);
     if (!canShareFiles) {
@@ -204,6 +280,70 @@
       var pad = function (n) { return (n < 10 ? "0" : "") + n; };
       return pad(d.getDate()) + "/" + pad(d.getMonth() + 1) + "/" + d.getFullYear() +
         " " + pad(d.getHours()) + ":" + pad(d.getMinutes());
+    }
+
+    function escapeHtml(str) {
+      return String(str || "").replace(/[&<>"']/g, function (c) {
+        return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+      });
+    }
+
+    function renderPendingList(stats) {
+      var sectors = Object.keys(stats.pending || {});
+      var totalPending = stats.total - stats.submitted;
+
+      if (totalPending === 0) {
+        pendingContent.innerHTML = '<p class="pending-done">🎉 جميع المراكز الـ' + stats.total + ' أرسلت بياناتها.</p>';
+        return;
+      }
+
+      var html = "";
+      sectors.forEach(function (sector) {
+        var names = stats.pending[sector];
+        var sectorTotal = stats.sectors[sector].total;
+        html += '<div class="pending-sector">';
+        html += '<div class="pending-sector-title">قطاع ' + escapeHtml(sector) +
+          ' <span class="count">(' + names.length + ' من ' + sectorTotal + ' متأخر)</span></div>';
+        if (names.length === 0) {
+          html += '<p class="pending-done">✅ اكتمل القطاع</p>';
+        } else {
+          html += '<ol class="pending-list">' + names.map(function (n) {
+            return "<li>" + escapeHtml(n) + "</li>";
+          }).join("") + "</ol>";
+        }
+        html += "</div>";
+      });
+      pendingContent.innerHTML = html;
+    }
+
+    function buildPendingText(stats) {
+      var totalPending = stats.total - stats.submitted;
+      var lines = [];
+      lines.push("📋 المراكز الصحية المتأخرة عن إرسال البيانات");
+      lines.push("تجمع عسير الصحي - مستشفى المجاردة العام");
+      lines.push("تحديث: " + formatDateTime(stats.updatedAt));
+      lines.push("");
+
+      if (totalPending === 0) {
+        lines.push("🎉 جميع المراكز الـ" + stats.total + " أرسلت بياناتها.");
+      } else {
+        Object.keys(stats.pending || {}).forEach(function (sector) {
+          var names = stats.pending[sector];
+          var sectorTotal = stats.sectors[sector].total;
+          lines.push("قطاع " + sector + " (" + names.length + " من " + sectorTotal + " متأخر):");
+          if (names.length === 0) {
+            lines.push("✅ اكتمل القطاع");
+          } else {
+            names.forEach(function (n, i) {
+              lines.push((i + 1) + ". " + n);
+            });
+          }
+          lines.push("");
+        });
+      }
+
+      lines.push("رابط النموذج: " + FORM_URL);
+      return lines.join("\n");
     }
 
     var COLORS = {
@@ -430,6 +570,7 @@
       setStatus("جارٍ التحميل...");
       downloadBtn.disabled = true;
       shareBtn.disabled = true;
+      whatsappBtn.disabled = true;
       refreshBtn.disabled = true;
 
       Promise.all([
@@ -444,8 +585,10 @@
           lastStats = results[0];
           render(results[0], results[1]);
           cardImg.src = canvas.toDataURL("image/png");
+          renderPendingList(results[0]);
           setStatus("تم التحديث بنجاح");
           downloadBtn.disabled = false;
+          whatsappBtn.disabled = false;
           if (canShareFiles) shareBtn.disabled = false;
         })
         .catch(function () {
@@ -486,6 +629,12 @@
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+    });
+
+    whatsappBtn.addEventListener("click", function () {
+      if (!lastStats) return;
+      var text = buildPendingText(lastStats);
+      window.open("https://wa.me/?text=" + encodeURIComponent(text), "_blank");
     });
 
     refreshBtn.addEventListener("click", load);
